@@ -1,53 +1,69 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Posts') }}
-            </h2>
+            <div>
+                <h2 class="text-2xl font-bold text-gray-900">Latest Posts</h2>
+                <p class="text-sm text-gray-500 mt-1">Thoughts, stories and ideas</p>
+            </div>
             <a href="{{ route('posts.create') }}"
-               class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700">
+               class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition">
                 + New Post
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-10">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6">
 
             @if (session('status'))
-                <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-                    {{ session('status') }}
+                <div class="mb-6 flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 text-sm px-4 py-3 rounded-xl">
+                    <span>✓</span> {{ session('status') }}
                 </div>
             @endif
 
             @forelse ($posts as $post)
-                <div class="bg-white shadow-sm rounded-lg mb-6 overflow-hidden">
+                <article class="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6 overflow-hidden hover:shadow-md transition">
 
                     @if ($post->image)
                         <img src="{{ asset('storage/' . $post->image) }}"
-                             class="w-full h-48 object-cover">
+                             class="w-full h-52 object-cover">
                     @endif
 
                     <div class="p-6">
-                        <h2 class="text-xl font-bold text-gray-800 mb-1">
+                        {{-- Author row --}}
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
+                                {{ strtoupper(substr($post->user->name, 0, 1)) }}
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">{{ $post->user->name }}</p>
+                                <p class="text-xs text-gray-400">{{ $post->created_at->diffForHumans() }}</p>
+                            </div>
+                        </div>
+
+                        {{-- Title --}}
+                        <h2 class="text-xl font-bold text-gray-900 mb-2 leading-snug">
                             {{ $post->title }}
                         </h2>
-                        <p class="text-sm text-gray-500 mb-3">
-                            By {{ $post->user->name }} · {{ $post->created_at->diffForHumans() }}
+
+                        {{-- Body preview --}}
+                        <p class="text-gray-500 text-sm leading-relaxed mb-4">
+                            {{ Str::limit($post->body, 120) }}
                         </p>
-                        <p class="text-gray-600 mb-4">
-                            {{ Str::limit($post->body, 150) }}
-                        </p>
+
+                        {{-- Read more --}}
                         <a href="{{ route('posts.show', $post->id) }}"
-                           class="text-indigo-600 hover:underline text-sm font-medium">
-                            Read More →
+                           class="inline-block text-indigo-600 text-sm font-semibold hover:underline">
+                            Read more →
                         </a>
                     </div>
 
-                </div>
+                </article>
             @empty
-                <div class="bg-white shadow-sm rounded-lg p-6 text-center text-gray-500">
-                    No posts yet. Be the first to create one!
+                <div class="text-center py-20 text-gray-400">
+                    <p class="text-5xl mb-4">✍️</p>
+                    <p class="text-lg font-medium">No posts yet</p>
+                    <p class="text-sm mt-1">Be the first to share something!</p>
                 </div>
             @endforelse
 
